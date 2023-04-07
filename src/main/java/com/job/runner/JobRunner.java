@@ -12,7 +12,6 @@ import zowe.client.sdk.zosfiles.types.AttributeType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Following program provides a way to define a set of jobs to be submitted together in like a multi batch process on
@@ -24,16 +23,47 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class JobRunner {
 
+    /**
+     * Time out value for each thread task processing for a job submission.
+     */
     private static final int TIMEOUT = 300;
+    /**
+     * Number of threads for thread pool used for submitting each job.
+     */
     private static final int NUM_OF_THREADS = 10;
+    /**
+     * Contains a list of all successful submitted job's responses.
+     */
     private static final StringBuilder jobsStatus = new StringBuilder();
+    /**
+     * Contains a list of all failed submitted job's responses.
+     */
     private static final StringBuilder jobsErrorStatus = new StringBuilder();
+    /**
+     * Contains a list of jobs to submit.
+     */
     private static final List<CandidateJob> candidateJobs = new ArrayList<>();
+    /**
+     * Connection object needed for z/OSMF Rest API call.
+     */
     private static ZOSConnection connection;
+    /**
+     * Partition data set location where members are located to submit a job for each.
+     */
     private static String pdsLocation;
+    /**
+     * User's account number to use for jcl job card for each job that will be submitted.
+     */
     private static String accountNumber;
+    /**
+     * System ID to specify a particular system especially in a sysplex environment.
+     * This field is optional.
+     */
     private static String ssid;
 
+    /**
+     * Initial setup performs the readiness objects need for the automation.
+     */
     private static void initialSetup() {
         final var hostName = System.getProperty("hostName");
         final var zosmfPort = System.getProperty("zosmfPort");
@@ -47,10 +77,13 @@ public class JobRunner {
         ValidateUtils.checkNullParameter(password == null, "-Dpassword not specified");
         ValidateUtils.checkNullParameter(pdsLocation == null, "-DpdsLocation not specified");
         ValidateUtils.checkNullParameter(accountNumber == null, "-accountNumber not specified");
-        ssid = System.getProperty("ssid");
+        ssid = System.getProperty("ssid"); // optional no null check as such
         connection = new ZOSConnection(hostName, zosmfPort, userName, password);
     }
 
+    /**
+     * Print out each submitted job failed status.
+     */
     public static void jobLstFailureStatus() {
         if (!jobsErrorStatus.isEmpty()) {
             System.out.println("Following jobs failed: ");
@@ -58,12 +91,20 @@ public class JobRunner {
         }
     }
 
+    /**
+     * Retrieve a list of member names from a data set location from pdsLocation parameter.
+     *
+     * @throws Exception processing error
+     */
     private static void jobLstSetup() throws Exception {
         final var params = new ListParams.Builder().attribute(AttributeType.MEMBER).build();
         final var members = new ZosDsnList(connection).listDsnMembers(pdsLocation, params);
         members.forEach(m -> candidateJobs.add(new CandidateJob(pdsLocation, m.getMember().get(), accountNumber, ssid)));
     }
 
+    /**
+     * Print out each submitted job success status.
+     */
     public static void jobLstSuccessStatus() {
         if (!jobsStatus.isEmpty()) {
             System.out.println("Following jobs submitted successfully, status:");
@@ -71,6 +112,9 @@ public class JobRunner {
         }
     }
 
+    /**
+     * Take the list of members compiled and submit a job for each.
+     */
     private static void submitJobs() {
         final var pool = Executors.newFixedThreadPool(NUM_OF_THREADS);
         final var futures = new ArrayList<Future<Response>>();
@@ -96,6 +140,12 @@ public class JobRunner {
         pool.shutdownNow();
     }
 
+    /**
+     * Main method that drives the automation.
+     *
+     * @param args no args used
+     * @throws Exception processing error
+     */
     public static void main(String[] args) throws Exception {
         initialSetup();
         jobLstSetup();
