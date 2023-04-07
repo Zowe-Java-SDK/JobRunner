@@ -29,7 +29,6 @@ public class Submit {
     private final CandidateJob candidateJob;
     private final ZosDsnDownload zosDsnDownload;
     private final DownloadParams downloadParams;
-    private final SubmitJobParams submitParams;
     private final SubmitJobs submitJob;
     private final MonitorJobs monitorJobs;
     private String jclContent = null;
@@ -39,7 +38,7 @@ public class Submit {
         this.zosDsnDownload = new ZosDsnDownload(connection);
         this.submitJob = new SubmitJobs(connection);
         this.monitorJobs = new MonitorJobs(connection);
-        this.submitParams = new SubmitJobParams(candidateJob.dataset() + "(" + candidateJob.member() + ")");
+        final var submitParams = new SubmitJobParams(candidateJob.dataset() + "(" + candidateJob.member() + ")");
         this.jobIdentifier = submitParams.getJobDataSet().get();
         this.downloadParams = new DownloadParams.Builder().build();
     }

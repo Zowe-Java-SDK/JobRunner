@@ -29,13 +29,12 @@ public class JobRunner {
     private static final StringBuilder jobsErrorStatus = new StringBuilder();
     private static final List<CandidateJob> candidateJobs = new ArrayList<>();
     private static ZOSConnection connection;
-    private static String hostName;
     private static String pdsLocation;
     private static String accountNumber;
     private static String ssid;
 
     private static void initialSetup() {
-        hostName = System.getProperty("hostName");
+        final var hostName = System.getProperty("hostName");
         final var zosmfPort = System.getProperty("zosmfPort");
         final var userName = System.getProperty("userName");
         final var password = System.getProperty("password");
