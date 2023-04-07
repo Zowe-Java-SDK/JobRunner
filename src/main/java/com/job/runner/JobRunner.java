@@ -68,25 +68,22 @@ public class JobRunner {
         }
     }
 
-    private static AtomicInteger submitJobs() {
+    private static void submitJobs() {
         final var pool = Executors.newFixedThreadPool(NUM_OF_THREADS);
         final var futures = new ArrayList<Future<Response>>();
 
         candidateJobs.forEach(j -> futures.add(pool.submit(new FutureSubmit(j, connection))));
 
-        final var failures = new AtomicInteger();
         futures.forEach(f -> {
             Response result;
             try {
                 result = f.get(TIMEOUT, TimeUnit.SECONDS);
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
                 e.printStackTrace();
-                failures.getAndIncrement();
                 jobsErrorStatus.append(e.getMessage());
                 return; // continue
             }
             if (!result.isSuccess()) {
-                failures.getAndIncrement();
                 jobsErrorStatus.append(result.message());
             } else {
                 jobsStatus.append(result.message());
@@ -94,7 +91,6 @@ public class JobRunner {
         });
 
         pool.shutdownNow();
-        return failures;
     }
 
     public static void main(String[] args) throws Exception {
