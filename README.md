@@ -40,11 +40,9 @@ The following attribute defines the Partition Dataset (PDS) location where each 
   
     pdsLocation
         
-Each member in pdsLocation is stripped of its job card information. The program will read each member content and append a job card and submit it.  
-  
-The processing of the automation of this program is done via the Zowe Java Client SDK. The SDK performs z/OSMF REST API calls against the backend z/OS instance.  
-   
-The job card used for each job submission is the following:  
+Each member in pdsLocation needs to exist with it job card stripped. The program will read each member content and append a job card and submit it.
+     
+The job card used for each job submission is generated in the following way:   
   
             final var jobCard = """
             //%s JOB (%s),'%s',NOTIFY=&SYSUID,CLASS=A,
@@ -52,6 +50,8 @@ The job card used for each job submission is the following:
             %s
             """.formatted(candidateJob.member(), candidateJob.acctNum(), candidateJob.member(), 
                candidateJob.ssid() != null ? "/*JOBPARM SYSAFF=" + candidateJob.ssid() : "//*");
+  
+NOTE: The processing of the automation of this program is done via the Zowe Java Client SDK. The SDK performs z/OSMF REST API calls against the backend z/OS instance.  
   
 ## Build And Execute
   
