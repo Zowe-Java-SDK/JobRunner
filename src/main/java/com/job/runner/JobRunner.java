@@ -14,7 +14,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Following project provides a way to define a set of jobs to be submitted together in like a multi batch process on
+ * Following program provides a way to define a set of jobs to be submitted together in like a multi batch process on
  * your z/OS instance(s). It can be used to automate a set of jobs to be submitted on a scheduled bases using for
  * instance Jenkins. Each job is submitted in an asynchronous way. As such, these jobs are submitted via a thread pool.
  * The advantage of a thread pool speeds up execution and completion time.
