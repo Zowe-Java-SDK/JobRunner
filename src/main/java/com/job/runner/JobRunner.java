@@ -11,7 +11,6 @@ import zowe.client.sdk.zosfiles.types.AttributeType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Following program provides a way to define a set of jobs to be submitted together in like a multi batch process on

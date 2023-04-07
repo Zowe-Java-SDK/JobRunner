@@ -7,4 +7,5 @@ package com.job.runner.record;
  * @param isSuccess indicates submitted job success status
  * @author Frank Giordano
  */
-public record Response(String message, boolean isSuccess) {}
+public record Response(String message, boolean isSuccess) {
+}

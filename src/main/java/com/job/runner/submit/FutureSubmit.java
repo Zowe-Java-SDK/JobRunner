@@ -7,7 +7,7 @@ import zowe.client.sdk.core.ZOSConnection;
 import java.util.concurrent.Callable;
 
 /**
- *  Class wraps a Callable object to be used to perform a threaded task that submits a job.
+ * Class wraps a Callable object to be used to perform a threaded task that submits a job.
  *
  * @author Frank Giordano
  */
