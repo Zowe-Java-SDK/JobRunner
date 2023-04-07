@@ -25,14 +25,41 @@ import java.io.StringWriter;
 public class Submit {
 
     private static final Logger LOG = LogManager.getLogger(Submit.class);
+    /**
+     * Job identifier in the following format i.e. xxx.xxx.xxx(xxx)
+     */
     private final String jobIdentifier;
+    /**
+     * Job info that will be used to submit the job.
+     */
     private final CandidateJob candidateJob;
+    /**
+     * Download object to be used to download a member that represent a job.
+     */
     private final ZosDsnDownload zosDsnDownload;
+    /**
+     * Download parameters.
+     */
     private final DownloadParams downloadParams;
+    /**
+     * SubmitJob object to perform the submit job action.
+     */
     private final SubmitJobs submitJob;
+    /**
+     * MonitorJobs object to be used to monitor a job until ended.
+     */
     private final MonitorJobs monitorJobs;
+    /**
+     * JCL content of the member that represent a job to be submitted.
+     */
     private String jclContent = null;
 
+    /**
+     * Submit constructor.
+     *
+     * @param candidateJob job to be submitted
+     * @param connection   connection info for z/OSMF
+     */
     public Submit(CandidateJob candidateJob, ZOSConnection connection) {
         this.candidateJob = candidateJob;
         this.zosDsnDownload = new ZosDsnDownload(connection);
@@ -43,10 +70,22 @@ public class Submit {
         this.downloadParams = new DownloadParams.Builder().build();
     }
 
+    /**
+     * Formulate a job failure message to be reported as a status.
+     *
+     * @param e execution information
+     * @return string message
+     */
     private String getMessage(Exception e) {
         return jobIdentifier + " - " + e.getMessage();
     }
 
+    /**
+     * Read member JCL content and append generated job card to content to a global variable to be used in a subsequent
+     * method to submit it as a job.
+     *
+     * @return response object when a failure occurs
+     */
     private Response setupJcl() {
         var count = 0;
         final var MAX_TRIES = 3;
@@ -84,6 +123,11 @@ public class Submit {
         return null;
     }
 
+    /**
+     * Perform a job submit action.
+     *
+     * @return job response
+     */
     private Response submit() {
         final var response = setupJcl();
         if (response != null) {
@@ -122,6 +166,11 @@ public class Submit {
         return new Response(message, true);
     }
 
+    /**
+     * Wrapper method that calls submit() method.
+     *
+     * @return job response
+     */
     public Response submitJob() {
         return submit();
     }
