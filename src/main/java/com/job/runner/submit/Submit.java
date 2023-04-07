@@ -17,6 +17,11 @@ import zowe.client.sdk.zosjobs.types.JobStatus;
 import java.io.InputStream;
 import java.io.StringWriter;
 
+/**
+ * Class of job submission. Contains the methods to perform a job submit.
+ *
+ * @author Frank Giordano
+ */
 public class Submit {
 
     private static final Logger LOG = LogManager.getLogger(Submit.class);
