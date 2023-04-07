@@ -4,6 +4,7 @@ import com.job.runner.record.CandidateJob;
 import com.job.runner.record.Response;
 import com.job.runner.submit.FutureSubmit;
 import zowe.client.sdk.core.ZOSConnection;
+import zowe.client.sdk.utility.ValidateUtils;
 import zowe.client.sdk.zosfiles.ZosDsnList;
 import zowe.client.sdk.zosfiles.input.ListParams;
 import zowe.client.sdk.zosfiles.types.AttributeType;
@@ -11,6 +12,7 @@ import zowe.client.sdk.zosfiles.types.AttributeType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Following program provides a way to define a set of jobs to be submitted together in like a multi batch process on
@@ -39,11 +41,13 @@ public class JobRunner {
         final var password = System.getProperty("password");
         pdsLocation = System.getProperty("pdsLocation");
         accountNumber = System.getProperty("accountNumber");
-        try {
-            ssid = System.getProperty("ssid");
-        } catch (Exception e) {
-            ssid = null;
-        }
+        ValidateUtils.checkNullParameter(hostName == null, "-DhostName not specified");
+        ValidateUtils.checkNullParameter(zosmfPort == null, "-DzosmfPort not specified");
+        ValidateUtils.checkNullParameter(userName == null, "-DuserName not specified");
+        ValidateUtils.checkNullParameter(password == null, "-Dpassword not specified");
+        ValidateUtils.checkNullParameter(pdsLocation == null, "-DpdsLocation not specified");
+        ValidateUtils.checkNullParameter(accountNumber == null, "-accountNumber not specified");
+        ssid = System.getProperty("ssid");
         connection = new ZOSConnection(hostName, zosmfPort, userName, password);
     }
 
