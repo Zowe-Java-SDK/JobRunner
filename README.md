@@ -4,7 +4,7 @@ Following project provides a way to define a set of jobs to be submitted togethe
 
 It can be used to automate a set of jobs to be submitted on a scheduled basis using for instance Jenkins.
 
-Each job is submitted in an asynchronous way. As such, these jobs are submitted via a thread pool. A thread pool provides a quicker execution completion time, and each job is executed independently from each other so one failure won't block others.
+Each job is submitted in an asynchronous way via a thread pool. Threads speeds up completion time and exceptions are easily isolated from each other.  
     
 ## Requirements
   
