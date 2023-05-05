@@ -4,7 +4,7 @@ Following project provides a way to define a set of jobs to be submitted togethe
 
 It can be used to automate a set of jobs to be submitted on a scheduled basis using for instance Jenkins.
 
-Each job is submitted in an asynchronous way. As such, these jobs are submitted via a thread pool. The advantage of a thread pool speeds up execution and completion time.
+Each job is submitted in an asynchronous way. As such, these jobs are submitted via a thread pool. A thread pool provides a quicker execution completion time, and each job is executed independently from each other so one failure won't block others.
     
 ## Requirements
   
@@ -40,7 +40,7 @@ The following attribute defines the Partition Dataset (PDS) location where each 
   
     pdsLocation
         
-Each member in pdsLocation needs to exist with it job card stripped. The program will read each member content and append a job card and submit it.
+Each member in pdsLocation needs to exist with its job card info stripped. The program will read each member's content and append a job card and submit it.
      
 The job card used for each job submission is generated in the following way:   
   
@@ -158,7 +158,7 @@ Execute the program with the info noted above, each member will be submitted as 
   
 log4j2 is configured for the project.  
    
-Find the log4j2.xml file under the resources directory. By default, log level is set to info.  
+Find the log4j2.xml file under the resources directory. By default, log level is set to INFO.  
   
-For debugging output especially for Zowe client java sdk, set the log level to debug.  
+For debugging output especially for Zowe Client Java SDK, set the log level to debug.  
   
