@@ -3,6 +3,7 @@ package com.job.runner;
 import com.job.runner.record.CandidateJob;
 import com.job.runner.record.Response;
 import com.job.runner.submit.FutureSubmit;
+import com.job.runner.utility.Util;
 import zowe.client.sdk.core.ZosConnection;
 import zowe.client.sdk.rest.exception.ZosmfRequestException;
 import zowe.client.sdk.utility.ValidateUtils;
@@ -109,7 +110,8 @@ public class JobRunner {
                 candidateJobs.add(candidate);
             }
         } catch (ZosmfRequestException e) {
-            throw new RuntimeException(e);
+            final String errMsg = Util.getResponsePhrase(e.getResponse());
+            throw new RuntimeException((errMsg != null ? errMsg : e.getMessage()));
         }
     }
 
