@@ -3,11 +3,13 @@ package com.job.runner;
 import com.job.runner.record.CandidateJob;
 import com.job.runner.record.Response;
 import com.job.runner.submit.FutureSubmit;
-import zowe.client.sdk.core.ZOSConnection;
+import zowe.client.sdk.core.ZosConnection;
+import zowe.client.sdk.rest.exception.ZosmfRequestException;
 import zowe.client.sdk.utility.ValidateUtils;
-import zowe.client.sdk.zosfiles.ZosDsnList;
-import zowe.client.sdk.zosfiles.input.ListParams;
-import zowe.client.sdk.zosfiles.types.AttributeType;
+import zowe.client.sdk.zosfiles.dsn.input.ListParams;
+import zowe.client.sdk.zosfiles.dsn.methods.DsnList;
+import zowe.client.sdk.zosfiles.dsn.response.Member;
+import zowe.client.sdk.zosfiles.dsn.types.AttributeType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +48,7 @@ public class JobRunner {
     /**
      * Connection object needed for z/OSMF Rest API call.
      */
-    private static ZOSConnection connection;
+    private static ZosConnection connection;
     /**
      * Partition data set location where members are located to submit a job for each.
      */
@@ -78,7 +80,7 @@ public class JobRunner {
         ValidateUtils.checkNullParameter(pdsLocation == null, "-DpdsLocation not specified");
         ValidateUtils.checkNullParameter(accountNumber == null, "-accountNumber not specified");
         ssid = System.getProperty("ssid"); // optional no null check as such
-        connection = new ZOSConnection(hostName, zosmfPort, userName, password);
+        connection = new ZosConnection(hostName, zosmfPort, userName, password);
     }
 
     /**
@@ -93,13 +95,22 @@ public class JobRunner {
 
     /**
      * Retrieve a list of member names from a data set location from pdsLocation parameter.
-     *
-     * @throws Exception processing error
      */
-    private static void jobLstSetup() throws Exception {
-        final var params = new ListParams.Builder().attribute(AttributeType.MEMBER).build();
-        final var members = new ZosDsnList(connection).listDsnMembers(pdsLocation, params);
-        members.forEach(m -> candidateJobs.add(new CandidateJob(pdsLocation, m.getMember().get(), accountNumber, ssid)));
+    private static void jobLstSetup() {
+        try {
+            final var params = new ListParams.Builder().attribute(AttributeType.MEMBER).build();
+            final var members = new DsnList(connection).getMembers(pdsLocation, params);
+            for (Member member : members) {
+                final var candidate = new CandidateJob(
+                        pdsLocation,
+                        member.getMember().orElseThrow(() -> new ZosmfRequestException("member missing")),
+                        accountNumber,
+                        ssid);
+                candidateJobs.add(candidate);
+            }
+        } catch (ZosmfRequestException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -126,7 +137,6 @@ public class JobRunner {
             try {
                 result = f.get(TIMEOUT, TimeUnit.SECONDS);
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                e.printStackTrace();
                 jobsErrorStatus.append(e.getMessage());
                 return; // continue
             }
@@ -144,9 +154,8 @@ public class JobRunner {
      * Main method that drives the automation.
      *
      * @param args no args used
-     * @throws Exception processing error
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         initialSetup();
         jobLstSetup();
         submitJobs();

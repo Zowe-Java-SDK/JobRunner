@@ -2,7 +2,7 @@ package com.job.runner.submit;
 
 import com.job.runner.record.CandidateJob;
 import com.job.runner.record.Response;
-import zowe.client.sdk.core.ZOSConnection;
+import zowe.client.sdk.core.ZosConnection;
 
 import java.util.concurrent.Callable;
 
@@ -19,7 +19,7 @@ public class FutureSubmit extends Submit implements Callable<Response> {
      * @param candidateJob job to be submitted
      * @param connection   connection info for z/OSMF
      */
-    public FutureSubmit(CandidateJob candidateJob, ZOSConnection connection) {
+    public FutureSubmit(CandidateJob candidateJob, ZosConnection connection) {
         super(candidateJob, connection);
     }
 
