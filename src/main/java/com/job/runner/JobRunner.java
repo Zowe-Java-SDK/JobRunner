@@ -141,9 +141,9 @@ public class JobRunner {
                 return; // continue
             }
             if (!result.isSuccess()) {
-                jobsErrorStatus.append(result.message());
+                jobsErrorStatus.append(result.message()).append("\n");
             } else {
-                jobsStatus.append(result.message());
+                jobsStatus.append(result.message()).append("\n");
             }
         });
 
