@@ -88,7 +88,7 @@ public class Submit {
         final var jobCard = """
                 //%s JOB (%s),'%s',NOTIFY=&SYSUID,CLASS=A,
                 //  MSGCLASS=X
-                 %s
+                %s
                 """
                 .formatted(candidateJob.member(), candidateJob.acctNum(), candidateJob.member(), ssid);
         var count = 0;

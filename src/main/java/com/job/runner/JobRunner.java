@@ -137,7 +137,7 @@ public class JobRunner {
             try {
                 result = f.get(TIMEOUT, TimeUnit.SECONDS);
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                jobsErrorStatus.append(e.getMessage());
+                jobsErrorStatus.append(e.getMessage()).append("\n");
                 return; // continue
             }
             if (!result.isSuccess()) {
