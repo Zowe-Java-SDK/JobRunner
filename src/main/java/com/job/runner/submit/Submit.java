@@ -117,7 +117,7 @@ public class Submit {
                 }
             }
         }
-        return new Response(getMessage("no jcl content error"), false);
+        return new Response("", true);
     }
 
     /**
