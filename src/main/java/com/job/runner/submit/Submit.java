@@ -102,7 +102,7 @@ public class Submit {
                     }
                 }
 
-                if (jclContent.isEmpty()) {
+                if (jclContent.isBlank()) {
                     throw new IllegalStateException("Cannot retrieve JCL content");
                 }
                 jclContent = jobCard + jclContent;
