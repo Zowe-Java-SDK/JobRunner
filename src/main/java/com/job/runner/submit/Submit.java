@@ -94,11 +94,12 @@ public class Submit {
         var count = 0;
         while (true) {
             try {
-                final var inputStream = dsnGet.get(this.jobIdentifier, downloadParams);
-                if (inputStream != null) {
-                    StringWriter writer = new StringWriter();
-                    IOUtils.copy(inputStream, writer, "UTF8");
-                    jclContent = writer.toString();
+                try (final var inputStream = dsnGet.get(this.jobIdentifier, downloadParams)) {
+                    if (inputStream != null) {
+                        StringWriter writer = new StringWriter();
+                        IOUtils.copy(inputStream, writer, "UTF8");
+                        jclContent = writer.toString();
+                    }
                 }
 
                 if (jclContent.isEmpty()) {
