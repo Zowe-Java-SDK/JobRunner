@@ -45,11 +45,11 @@ Each member in pdsLocation needs to exist with its job card info stripped. The p
 The job card used for each job submission is generated in the following way:   
   
             final var jobCard = """
-            //%s JOB (%s),'%s',NOTIFY=&SYSUID,CLASS=A,
-            //  MSGCLASS=X
-            %s
-            """.formatted(candidateJob.member(), candidateJob.acctNum(), candidateJob.member(), 
-               candidateJob.ssid() != null ? "/*JOBPARM SYSAFF=" + candidateJob.ssid() : "//*");
+                //%s JOB (%s),'%s',NOTIFY=&SYSUID,CLASS=A,
+                //  MSGCLASS=X
+                %s
+                """.formatted(candidateJob.member(), candidateJob.acctNum(), candidateJob.member(), 
+                    candidateJob.ssid() != null ? "/*JOBPARM SYSAFF=" + candidateJob.ssid() : "//*");
   
 NOTE: The processing of the automation of this program is done via the Zowe Java Client SDK. The SDK performs z/OSMF REST API calls against the backend z/OS instance.  
   
@@ -89,16 +89,7 @@ and the username BAAUTO will be used to execute the job submission with its acco
   
 Execute the program with the info noted above, each member will be submitted as a job:  
 
-    "C:\Program Files\Amazon Corretto\jdk17.0.4_9\bin\java.exe" -Dmaven.multiModuleProjectDirectory=C:\Users\fg\IdeaProjects\JobRunnerHandler
-    "-Dmaven.home=C:\Program Files\JetBrains\IntelliJ IDEA 2021.3\plugins\maven\lib\maven3"
-    "-Dclassworlds.conf=C:\Program Files\JetBrains\IntelliJ IDEA 2021.3\plugins\maven\lib\maven3\bin\m2.conf"
-    "-Dmaven.ext.class.path=C:\Program Files\JetBrains\IntelliJ IDEA 2021.3\plugins\maven\lib\maven-event-listener.jar"
-    "-javaagent:C:\Program Files\JetBrains\IntelliJ IDEA 2021.3\lib\idea_rt.jar=59126:C:\Program Files\JetBrains\IntelliJ IDEA 2021.3\bin"
-    -Dfile.encoding=UTF-8 -classpath
-    "C:\Program Files\JetBrains\IntelliJ IDEA 2021.3\plugins\maven\lib\maven3\boot\plexus-classworlds-2.6.0.jar;
-    C:\Program Files\JetBrains\IntelliJ IDEA 2021.3\plugins\maven\lib\maven3\boot\plexus-classworlds.license"
-    org.codehaus.classworlds.Launcher
-    -Didea.version=2022.2.5 clean compile exec:java
+    mvn clean compile exec:java
     -Dexec.mainClass=com.job.runner.JobRunner
     -DhostName=usilfake.broadcast.net
     -DzosmfPort=1443 
@@ -107,7 +98,6 @@ Execute the program with the info noted above, each member will be submitted as 
     -Dssid=BA31
     -DaccountNumber=105300000
     -DpdsLocation=CCSGLBL.PUBLIC.CCSTEAM.JCL
-    [INFO] Scanning for projects...
     [INFO] Scanning for projects...
     [INFO]
     [INFO] ----------------------< com.job.runner:JobRunner >----------------------
