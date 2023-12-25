@@ -1,6 +1,6 @@
 # JobRunner  
 
-Following project provides a way to define a set of jobs to be submitted together in like a multi batch process on your z/OS instance(s).
+Following project provides a way to define a set of jobs to be submitted together in like a multi batch process on your z/OS instance.
 
 It can be used to automate a set of jobs to be submitted on a scheduled basis using for instance Jenkins.
 
@@ -47,9 +47,9 @@ The job card used for each job submission is generated in the following way:
             final var jobCard = """
                 //%s JOB (%s),'%s',NOTIFY=&SYSUID,CLASS=A,
                 //  MSGCLASS=X
-                %s
-                """.formatted(candidateJob.member(), candidateJob.acctNum(), candidateJob.member(), 
-                    candidateJob.ssid() != null ? "/*JOBPARM SYSAFF=" + candidateJob.ssid() : "//*");
+                 %s
+                """
+                .formatted(candidateJob.member(), candidateJob.acctNum(), candidateJob.member(), ssid);
   
 NOTE: The processing of the automation of this program is done via the Zowe Java Client SDK. The SDK performs z/OSMF REST API calls against the backend z/OS instance.  
   
