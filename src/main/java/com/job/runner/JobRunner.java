@@ -139,13 +139,13 @@ public class JobRunner {
             try {
                 result = f.get(TIMEOUT, TimeUnit.SECONDS);
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                jobsErrorStatus.append(e.getMessage()).append("\n");
+                jobsErrorStatus.append(e.getMessage());
                 return; // continue
             }
             if (!result.isSuccess()) {
-                jobsErrorStatus.append(result.message()).append("\n");
+                jobsErrorStatus.append(result.message());
             } else {
-                jobsStatus.append(result.message()).append("\n");
+                jobsStatus.append(result.message());
             }
         });
 

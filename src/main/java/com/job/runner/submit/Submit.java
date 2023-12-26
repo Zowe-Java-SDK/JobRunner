@@ -72,7 +72,7 @@ public class Submit {
      * @return string message
      */
     private String getMessage(String msg) {
-        return jobIdentifier + " - " + msg;
+        return jobIdentifier + " - " + msg + "\n";
     }
 
     /**
