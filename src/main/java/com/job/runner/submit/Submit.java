@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import zowe.client.sdk.core.ZosConnection;
 import zowe.client.sdk.rest.exception.ZosmfRequestException;
+import zowe.client.sdk.utility.timer.WaitUtil;
 import zowe.client.sdk.zosfiles.dsn.input.DownloadParams;
 import zowe.client.sdk.zosfiles.dsn.methods.DsnGet;
 import zowe.client.sdk.zosjobs.methods.JobMonitor;
@@ -109,6 +110,7 @@ public class Submit {
                 break;
             } catch (ZosmfRequestException | IOException e) {
                 if (MAX_TRIES == ++count) {
+                    WaitUtil.wait(2000);
                     if (e instanceof ZosmfRequestException zosmfRequestException) {
                         final String errMsg = Util.getResponsePhrase(zosmfRequestException.getResponse());
                         return new Response(getMessage((errMsg != null ? errMsg : e.getMessage())), false);
