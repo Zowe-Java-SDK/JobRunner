@@ -5,7 +5,9 @@ Following project provides a way to define a set of jobs to be submitted togethe
 It can be used to automate a set of jobs to be submitted on a scheduled basis using for instance Jenkins.
 
 Each job is submitted in an asynchronous way via a thread pool. Threads speeds up completion time and exceptions are easily isolated from each other.  
-    
+
+Project demonstrates the usage of [Zowe Client Java SDK](https://github.com/zowe/zowe-client-java-sdk).    
+      
 ## Requirements
   
     Java 17  
@@ -47,7 +49,7 @@ The job card used for each job submission is generated in the following way:
             final var jobCard = """
                 //%s JOB (%s),'%s',NOTIFY=&SYSUID,CLASS=A,
                 //  MSGCLASS=X
-                 %s
+                %s
                 """
                 .formatted(candidateJob.member(), candidateJob.acctNum(), candidateJob.member(), ssid);
   
