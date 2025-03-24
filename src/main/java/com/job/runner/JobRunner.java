@@ -107,10 +107,8 @@ public class JobRunner {
         } catch (ZosmfRequestException e) {
             throw new RuntimeException(e);
         }
-        candidateJobs = members.stream()
-                .filter(m -> m.getMember().isPresent())
-                .map(m -> makeCandidateJob(m.getMember().get()))
-                .toList();
+        candidateJobs = members.stream().filter(m -> m.getMember().isPresent())
+                .map(m -> makeCandidateJob(m.getMember().get())).toList();
     }
 
     /**
