@@ -1,10 +1,10 @@
 # JobRunner  
-
-Following project provides a way to define a set of jobs to be submitted together in like a multi batch process on your z/OS instance.
-
-It can be used to automate a set of jobs to be submitted on a scheduled basis using for instance Jenkins.
-
-Each job is submitted in an asynchronous way via a thread pool. Threads speeds up completion time and exceptions are easily isolated from each other.  
+  
+The following program provides a way to define a set of jobs to be submitted together on your z/OS instance.   
+  
+It can be used to automate a set of jobs to be submitted on a scheduled basis using, for instance, Jenkins.  
+  
+Each job is submitted in an asynchronous manner, speeding up execution and completion time.  
 
 Project demonstrates the usage of [Zowe Client Java SDK](https://github.com/zowe/zowe-client-java-sdk).    
       
@@ -150,7 +150,7 @@ Execute the program with the info noted above, each member will be submitted as 
   
 log4j2 is configured for the project.  
    
-Find the log4j2.xml file under the resources directory. By default, log level is set to INFO.  
+Find the log4j2.xml file under the resources' directory. By default, log level is set to INFO.  
   
 For debugging output especially for Zowe Client Java SDK, set the log level to debug.  
   
