@@ -39,7 +39,7 @@ public class JobRunner {
     /**
      * Contains a list of all failed submitted job's responses.
      */
-    private static final StringBuilder jobsErrorStatus = new StringBuilder();
+    private static final StringBuilder jobsErrStatus = new StringBuilder();
     /**
      * Contains a list of jobs to submit.
      */
@@ -90,9 +90,9 @@ public class JobRunner {
             System.out.println("Following jobs successfully executed:");
             System.out.println(jobsStatus);
         }
-        if (!jobsErrorStatus.isEmpty()) {
+        if (!jobsErrStatus.isEmpty()) {
             System.out.println("Following jobs failed to execute:");
-            System.out.println(jobsErrorStatus);
+            System.out.println(jobsErrStatus);
         }
     }
 
@@ -136,11 +136,11 @@ public class JobRunner {
             try {
                 responses.add(f.get(TIMEOUT, TimeUnit.SECONDS));
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                jobsErrorStatus.append(e.getMessage());
+                jobsErrStatus.append(e.getMessage());
             }
         });
         responses.stream().filter(Response::isSuccess).forEach(jobsStatus::append);
-        responses.stream().filter(Response::isFailed).forEach(jobsErrorStatus::append);
+        responses.stream().filter(Response::isFailed).forEach(jobsErrStatus::append);
 
         pool.shutdownNow();
     }
