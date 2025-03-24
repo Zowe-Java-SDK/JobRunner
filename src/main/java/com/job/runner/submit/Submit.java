@@ -65,7 +65,7 @@ public class Submit {
     }
 
     /**
-     * Formulate a job failure message to be reported as a status.
+     * Formulate a job message to be reported as a status.
      *
      * @param msg string message value
      * @return string message
