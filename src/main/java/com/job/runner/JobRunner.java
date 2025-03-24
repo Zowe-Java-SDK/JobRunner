@@ -87,11 +87,11 @@ public class JobRunner {
      */
     private static void jobLstStatus() {
         if (!jobsStatus.isEmpty()) {
-            System.out.println("Following jobs submitted successfully, status:");
+            System.out.println("Following jobs successfully executed:");
             System.out.println(jobsStatus);
         }
         if (!jobsErrorStatus.isEmpty()) {
-            System.out.println("Following jobs failed: ");
+            System.out.println("Following jobs failed to execute:");
             System.out.println(jobsErrorStatus);
         }
     }
