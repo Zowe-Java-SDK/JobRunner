@@ -140,7 +140,7 @@ public class JobRunner {
             }
         });
         responses.stream().filter(Response::isSuccess).forEach(jobsStatus::append);
-        responses.stream().filter(r -> !r.isSuccess()).forEach(jobsErrorStatus::append);
+        responses.stream().filter(Response::isFailed).forEach(jobsErrorStatus::append);
 
         pool.shutdownNow();
     }
