@@ -3,7 +3,6 @@ package com.job.runner;
 import com.job.runner.record.CandidateJob;
 import com.job.runner.record.Response;
 import com.job.runner.submit.FutureSubmit;
-import com.job.runner.utility.Util;
 import zowe.client.sdk.core.ZosConnection;
 import zowe.client.sdk.rest.exception.ZosmfRequestException;
 import zowe.client.sdk.utility.ValidateUtils;
@@ -44,7 +43,7 @@ public class JobRunner {
     /**
      * Contains a list of jobs to submit.
      */
-    private static final List<CandidateJob> candidateJobs = new ArrayList<>();
+    private static List<CandidateJob> candidateJobs = new ArrayList<>();
     /**
      * Connection object needed for z/OSMF Rest API call.
      */
@@ -67,10 +66,10 @@ public class JobRunner {
      * Initial setup performs the readiness objects need for the automation.
      */
     private static void initialSetup() {
-        final var hostName = System.getProperty("hostName");
-        final var zosmfPort = System.getProperty("zosmfPort");
-        final var userName = System.getProperty("userName");
-        final var password = System.getProperty("password");
+        var hostName = System.getProperty("hostName");
+        var zosmfPort = System.getProperty("zosmfPort");
+        var userName = System.getProperty("userName");
+        var password = System.getProperty("password");
         pdsLocation = System.getProperty("pdsLocation");
         accountNumber = System.getProperty("accountNumber");
         ValidateUtils.checkNullParameter(hostName == null, "-DhostName not specified");
@@ -84,9 +83,13 @@ public class JobRunner {
     }
 
     /**
-     * Print out each submitted job failed status.
+     * Print all submitted job statuses.
      */
-    public static void jobLstFailureStatus() {
+    private static void jobLstStatus() {
+        if (!jobsStatus.isEmpty()) {
+            System.out.println("Following jobs submitted successfully, status:");
+            System.out.println(jobsStatus);
+        }
         if (!jobsErrorStatus.isEmpty()) {
             System.out.println("Following jobs failed: ");
             System.out.println(jobsErrorStatus);
@@ -94,59 +97,50 @@ public class JobRunner {
     }
 
     /**
-     * Retrieve a list of member names from a data set location from pdsLocation parameter.
+     * Retrieve a list of member names from partition dataset location from pdsLocation parameter.
      */
     private static void jobLstSetup() {
+        var params = new ListParams.Builder().attribute(AttributeType.MEMBER).build();
+        List<Member> members;
         try {
-            final var params = new ListParams.Builder().attribute(AttributeType.MEMBER).build();
-            final var members = new DsnList(connection).getMembers(pdsLocation, params);
-            for (Member member : members) {
-                final var candidate = new CandidateJob(
-                        pdsLocation,
-                        member.getMember().orElseThrow(() -> new ZosmfRequestException("member missing")),
-                        accountNumber,
-                        ssid);
-                candidateJobs.add(candidate);
-            }
+            members = new DsnList(connection).getMembers(pdsLocation, params);
         } catch (ZosmfRequestException e) {
-            final String errMsg = Util.getResponsePhrase(e.getResponse());
-            throw new RuntimeException((errMsg != null ? errMsg : e.getMessage()));
+            throw new RuntimeException(e);
         }
+        candidateJobs = members.stream()
+                .filter(m -> m.getMember().isPresent())
+                .map(m -> makeCandidateJob(m.getMember().get()))
+                .toList();
     }
 
     /**
-     * Print out each submitted job success status.
+     * Helper method to create CandidateJob object.
+     *
+     * @param name string representing a member name
+     * @return CandidateJob object
      */
-    public static void jobLstSuccessStatus() {
-        if (!jobsStatus.isEmpty()) {
-            System.out.println("Following jobs submitted successfully, status:");
-            System.out.println(jobsStatus);
-        }
+    private static CandidateJob makeCandidateJob(String name) {
+        return new CandidateJob(pdsLocation, name, accountNumber, ssid);
     }
 
     /**
-     * Take the list of members compiled and submit a job for each.
+     * Take the list of members and submit a z/OS job for each and retrieve each job outcome status.
      */
     private static void submitJobs() {
-        final var pool = Executors.newFixedThreadPool(NUM_OF_THREADS);
-        final var futures = new ArrayList<Future<Response>>();
+        var pool = Executors.newFixedThreadPool(NUM_OF_THREADS);
+        var futures = new ArrayList<Future<Response>>();
+        var responses = new ArrayList<Response>();
 
         candidateJobs.forEach(j -> futures.add(pool.submit(new FutureSubmit(j, connection))));
-
         futures.forEach(f -> {
-            Response result;
             try {
-                result = f.get(TIMEOUT, TimeUnit.SECONDS);
+                responses.add(f.get(TIMEOUT, TimeUnit.SECONDS));
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
                 jobsErrorStatus.append(e.getMessage());
-                return; // continue
-            }
-            if (!result.isSuccess()) {
-                jobsErrorStatus.append(result.message());
-            } else {
-                jobsStatus.append(result.message());
             }
         });
+        responses.stream().filter(Response::isSuccess).forEach(jobsStatus::append);
+        responses.stream().filter(r -> !r.isSuccess()).forEach(jobsErrorStatus::append);
 
         pool.shutdownNow();
     }
@@ -160,8 +154,7 @@ public class JobRunner {
         initialSetup();
         jobLstSetup();
         submitJobs();
-        jobLstSuccessStatus();
-        jobLstFailureStatus();
+        jobLstStatus();
     }
 
 }

@@ -9,6 +9,5 @@ package com.job.runner.record;
  * @param ssid    ssid of the sysplex to submit job under, use to fill in job card, optional field
  * @author Frank Giordano
  */
-public record CandidateJob(String dataset, String member, String acctNum, String ssid) {
-}
+public record CandidateJob(String dataset, String member, String acctNum, String ssid) {}
 
