@@ -14,7 +14,7 @@ import java.util.concurrent.Callable;
 public class FutureSubmit extends Submit implements Callable<Response> {
 
     /**
-     * FutureSubmit constructor.
+     * FutureSubmit constructor
      *
      * @param candidateJob job to be submitted
      * @param connection   connection info for z/OSMF

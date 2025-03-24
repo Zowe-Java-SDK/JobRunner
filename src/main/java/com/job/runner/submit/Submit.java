@@ -2,13 +2,11 @@ package com.job.runner.submit;
 
 import com.job.runner.record.CandidateJob;
 import com.job.runner.record.Response;
-import com.job.runner.utility.Util;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import zowe.client.sdk.core.ZosConnection;
 import zowe.client.sdk.rest.exception.ZosmfRequestException;
-import zowe.client.sdk.utility.timer.WaitUtil;
 import zowe.client.sdk.zosfiles.dsn.input.DownloadParams;
 import zowe.client.sdk.zosfiles.dsn.methods.DsnGet;
 import zowe.client.sdk.zosjobs.methods.JobMonitor;
@@ -53,7 +51,7 @@ public class Submit {
     private String jclContent = null;
 
     /**
-     * Submit constructor.
+     * Submit constructor
      *
      * @param candidateJob job to be submitted
      * @param connection   connection info for z/OSMF
@@ -67,7 +65,7 @@ public class Submit {
     }
 
     /**
-     * Formulate a job failure message to be reported as a status.
+     * Formulate a job message to be reported as a status.
      *
      * @param msg string message value
      * @return string message
@@ -77,49 +75,37 @@ public class Submit {
     }
 
     /**
-     * Read member JCL content and append generated job card to content to a global variable to be used in a subsequent
-     * method to submit it as a job.
+     * Read member JCL content and append generated job card to content to a global variable to be used in a
+     * subsequent method to submit it as a job.
      *
      * @return Response object
      */
-    private Response setupJcl() {
-        final var MAX_TRIES = 5;
-        final var downloadParams = new DownloadParams.Builder().build();
-        final var ssid = candidateJob.ssid() != null ? "/*JOBPARM SYSAFF=" + candidateJob.ssid() : "//*";
-        final var jobCard = """
+    private boolean setupJcl() {
+        var downloadParams = new DownloadParams.Builder().build();
+        var ssid = candidateJob.ssid() != null ? "/*JOBPARM SYSAFF=" + candidateJob.ssid() : "//*";
+        var jobCard = """
                 //%s JOB (%s),'%s',NOTIFY=&SYSUID,CLASS=A,
                 //  MSGCLASS=X
                 %s
                 """
                 .formatted(candidateJob.member(), candidateJob.acctNum(), candidateJob.member(), ssid);
-        var count = 0;
-        while (true) {
-            try {
-                try (final var inputStream = dsnGet.get(this.jobIdentifier, downloadParams)) {
-                    if (inputStream != null) {
-                        StringWriter writer = new StringWriter();
-                        IOUtils.copy(inputStream, writer, "UTF8");
-                        jclContent = writer.toString();
-                    }
-                }
 
-                if (jclContent.isBlank()) {
-                    throw new IllegalStateException("Cannot retrieve JCL content");
-                }
-                jclContent = jobCard + jclContent;
-                break;
-            } catch (ZosmfRequestException | IOException e) {
-                if (MAX_TRIES == ++count) {
-                    WaitUtil.wait(2000);
-                    if (e instanceof ZosmfRequestException zosmfRequestException) {
-                        final String errMsg = Util.getResponsePhrase(zosmfRequestException.getResponse());
-                        return new Response(getMessage((errMsg != null ? errMsg : e.getMessage())), false);
-                    }
-                    return new Response(getMessage(e.getMessage()), false);
-                }
+        try (var inputStream = dsnGet.get(this.jobIdentifier, downloadParams)) {
+            if (inputStream != null) {
+                StringWriter writer = new StringWriter();
+                IOUtils.copy(inputStream, writer, "UTF8");
+                jclContent = writer.toString();
             }
+            if (jclContent.isBlank()) {
+                return false;
+            }
+        } catch (ZosmfRequestException | IOException e) {
+            System.err.println(e.getMessage());
+            return false;
         }
-        return new Response("", true);
+
+        jclContent = jobCard + jclContent;
+        return true;
     }
 
     /**
@@ -127,49 +113,36 @@ public class Submit {
      *
      * @return Response object
      */
-    private Response submit() {
-        final var response = setupJcl();
-        if (!response.isSuccess()) {
-            return response;
+    public Response submitJob() {
+        if (!setupJcl()) {
+            return new Response("Setup JCL failed for job submit", true);
         }
 
         Job job;
-        String returnCode;
-        String jobId;
         try {
             job = jobSubmit.submitByJcl(jclContent, null, null);
-            final var jobName = job.getJobName().orElseThrow(() -> new ZosmfRequestException("job name missing"));
-            jobId = job.getJobId().orElseThrow(() -> new ZosmfRequestException("job id missing"));
-            final var msg = "Waiting for jobName {} with jobId {} to complete.";
-            LOG.info(msg, jobName, jobId);
-            job = jobMonitor.waitByStatus(job, JobStatus.Type.OUTPUT);
-            returnCode = job.getRetCode().orElseThrow(() -> new ZosmfRequestException("job return code missing"));
         } catch (ZosmfRequestException e) {
-            final String errMsg = Util.getResponsePhrase(e.getResponse());
-            return new Response(getMessage(errMsg != null ? errMsg : e.getMessage()), false);
+            var errMsg = e.getResponse().getResponsePhrase().orElse(null);
+            return new Response(getMessage(errMsg == null ? e.getMessage() : errMsg.toString()), false);
         }
 
-        if (!returnCode.startsWith("CC")) {
-            try {
-                Integer.parseInt(returnCode);
-            } catch (NumberFormatException e) {
-                return new Response(getMessage("invalid job return code " + returnCode), false);
-            }
+        var jobName = job.getJobName().orElse("n\\a");
+        var jobId = job.getJobId().orElse("n\\a");
+        LOG.info("Waiting for jobName {} with jobId {} to complete.", jobName, jobId);
+
+        try {
+            job = jobMonitor.waitByStatus(job, JobStatus.Type.OUTPUT);
+        } catch (ZosmfRequestException e) {
+            var errMsg = e.getResponse().getResponsePhrase().orElse(null);
+            return new Response(getMessage(errMsg == null ? e.getMessage() : errMsg.toString()), false);
         }
-        final var end = candidateJob.ssid() != null ? " with SSID=" + candidateJob.ssid() + "." : ".";
-        final var msg = """
+        var returnCode = job.getRetCode().orElse("n\\a");
+
+        var end = candidateJob.ssid() != null ? " with SSID=" + candidateJob.ssid() + "." : ".";
+        var msg = """
                 Return code for %s and %s is %s%s
                 """.formatted(jobIdentifier, jobId, returnCode, end);
         return new Response(msg, true);
-    }
-
-    /**
-     * Wrapper method that calls submit() method.
-     *
-     * @return Response object
-     */
-    public Response submitJob() {
-        return submit();
     }
 
 }
