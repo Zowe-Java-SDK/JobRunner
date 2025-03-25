@@ -115,7 +115,7 @@ public class Submit {
      */
     public Response submitJob() {
         if (!setupJcl()) {
-            return new Response("Setup JCL failed for job submit", true);
+            return new Response("Setup JCL failed for job submit", false);
         }
 
         Job job;
