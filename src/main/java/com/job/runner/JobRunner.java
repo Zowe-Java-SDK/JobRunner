@@ -137,8 +137,8 @@ public class JobRunner {
                 jobsErrStatus.append(e.getMessage());
             }
         });
-        responses.stream().filter(Response::isSuccess).forEach(jobsStatus::append);
-        responses.stream().filter(Response::isFailed).forEach(jobsErrStatus::append);
+        responses.stream().filter(Response::isSuccess).forEach(j -> jobsStatus.append(j.message()));
+        responses.stream().filter(Response::isFailed).forEach(j -> jobsErrStatus.append(j.message()));
 
         pool.shutdownNow();
     }
