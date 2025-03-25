@@ -77,7 +77,7 @@ public class JobRunner {
         ValidateUtils.checkNullParameter(userName == null, "-DuserName not specified");
         ValidateUtils.checkNullParameter(password == null, "-Dpassword not specified");
         ValidateUtils.checkNullParameter(pdsLocation == null, "-DpdsLocation not specified");
-        ValidateUtils.checkNullParameter(accountNumber == null, "-accountNumber not specified");
+        ValidateUtils.checkNullParameter(accountNumber == null, "-DaccountNumber not specified");
         ssid = System.getProperty("ssid"); // optional no null check as such
         connection = new ZosConnection(hostName, zosmfPort, userName, password);
     }
