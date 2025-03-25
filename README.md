@@ -130,7 +130,7 @@ Execute the program with the info noted above, each member will be submitted as 
     19:56:18.991 INFO  - Waiting for status "OUTPUT"
     19:57:02.351 INFO  - Waiting for status "OUTPUT"
     19:57:10.107 INFO  - Waiting for status "OUTPUT"
-    Following jobs submitted successfully, status:
+    Following jobs successfully executed:
     Return code for CCSGLBL.PUBLIC.CCSTEAM.JCL(CCSDVTST) and JOB35756 is CC 0000 with SSID=BA31.
     Return code for CCSGLBL.PUBLIC.CCSTEAM.JCL(COMRSJCL) and JOB35752 is CC 0000 with SSID=BA31.
     Return code for CCSGLBL.PUBLIC.CCSTEAM.JCL(FRSREFR) and JOB35751 is CC 0001 with SSID=BA31.
