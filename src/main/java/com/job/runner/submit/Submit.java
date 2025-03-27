@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 /**
- * Class of job submission. Contains the methods to perform a job submit.
+ * Contains the methods to perform a job submit.
  *
  * @author Frank Giordano
  */
@@ -46,7 +46,7 @@ public class Submit {
      */
     private final JobMonitor jobMonitor;
     /**
-     * JCL content of the member that represent a job to be submitted.
+     * JCL content of the member that represents a job to be submitted.
      */
     private String jclContent = null;
 
@@ -75,7 +75,7 @@ public class Submit {
     }
 
     /**
-     * Read member JCL content and append generated job card to content to a global variable to be used in a
+     * Read member JCL content and append the generated job card to content to a global variable to be used in a
      * subsequent method to submit it as a job.
      *
      * @return Response object
