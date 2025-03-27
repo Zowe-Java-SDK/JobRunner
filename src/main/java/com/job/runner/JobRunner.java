@@ -50,6 +50,7 @@ public class JobRunner {
     private static ZosConnection connection;
     /**
      * Partition data set location where members are located to submit a job for each.
+     * Each member should not contain job card details. 
      */
     private static String pdsLocation;
     /**
@@ -63,7 +64,7 @@ public class JobRunner {
     private static String ssid;
 
     /**
-     * Initial setup performs the readiness objects need for the automation.
+     * Initial setup performs the readiness objects needed for the automation.
      */
     private static void initialSetup() {
         var hostName = System.getProperty("hostName");
@@ -97,7 +98,7 @@ public class JobRunner {
     }
 
     /**
-     * Retrieve a list of member names from partition dataset location from pdsLocation parameter.
+     * Retrieve a list of member names from the partition dataset location specified within the pdsLocation parameter.
      */
     private static void jobLstSetup() {
         var params = new ListParams.Builder().attribute(AttributeType.MEMBER).build();
@@ -112,7 +113,7 @@ public class JobRunner {
     }
 
     /**
-     * Helper method to create CandidateJob object.
+     * Helper method to create a CandidateJob object.
      *
      * @param name string representing a member name
      * @return CandidateJob object
